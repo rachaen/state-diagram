@@ -6,29 +6,42 @@ import Table from './components/Table.jsx';
 import MermaidDiagram from './components/MermaidDiagram.jsx';
 
 function App() {
-  const [states, setStates] = useState(['A', 'B', 'C', 'D']);
-  const [relations, setRelations] = useState({ A: ['B'], B: ['A'], C: ['A', 'B', 'C'], D: ['A', 'C', 'B'] });
-  const [curState, setCurState] = useState('B');
+  const [states, setStates] = useState([
+    'Power_on_Rst',
+    'Bus_Sleep',
+    'Repeat_Message',
+    'Normal_Operation',
+    'Ready_Sleep',
+    'Prepare_Bus_Sleep',
+  ]);
+  const [relations, setRelations] = useState({
+    Power_on_Rst: ['Bus_Sleep'],
+    Bus_Sleep: ['Repeat_Message'],
+    Repeat_Message: ['Normal_Operation', 'Ready_Sleep'],
+    Normal_Operation: ['Repeat_Message', 'Ready_Sleep'],
+    Ready_Sleep: ['Prepare_Bus_Sleep'],
+    Prepare_Bus_Sleep: ['Bus_Sleep', 'Repeat_Message'],
+  });
+  const [curState, setCurState] = useState('Bus_Sleep');
 
-  const diagram = `
+  const mermaidDiagram = `
   graph LR
-    Power_on_Rst -->| | Bus_Sleep
+    Power_on_Rst((Power on Rst)):::em1 --> Bus_Sleep
     Bus_Sleep --> Repeat_Message
-    Repeat_Message --> Normal_Operation
+    Repeat_Message <--> Normal_Operation
     Repeat_Message --> Ready_Sleep
-    Normal_Operation --> Ready_Sleep
+    Normal_Operation <--> Ready_Sleep
     Normal_Operation --> Repeat_Message
     Ready_Sleep --> Prepare_Bus_Sleep
-    Ready_Sleep --> Repeat_Message
-    Ready_Sleep --> Normal_Operation
     Prepare_Bus_Sleep --> Bus_Sleep
     Prepare_Bus_Sleep --> Repeat_Message
+    classDef em1 font-weight:bold
 `;
   return (
     <div>
       <Table states={states} relations={relations} />
       <StateDiagram states={states} relations={relations} curState={curState} />
-      <MermaidDiagram diagram={diagram} />
+      <MermaidDiagram diagram={mermaidDiagram} />
     </div>
   );
 }
